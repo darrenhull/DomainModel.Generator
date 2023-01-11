@@ -5,11 +5,13 @@ public class Node
     public Node(Type type)
     {
         Type = type;
+        ParentType = type.BaseType?.Name ?? String.Empty;
     }
     public string this[string name] => attributes[name];
     public string Name => Type.Name;
     public (string name, string type)[] Attributes => attributes.Select(a => (a.Key, a.Value)).ToArray();
     public Type Type { get; }
+    public string ParentType { get;  }
 
     public void AddPublicAttribute(string name, Type type)
     {
@@ -33,6 +35,13 @@ public class Edge
     public Node From { get; }
     public Node To { get; }
 }
+public class ChildEdge : Edge
+{
+    public ChildEdge(Node from, Node to) : base(from, to)
+    {
+    }
+}
+
 
 public class Graph
 {
@@ -88,5 +97,11 @@ public class Graph
         var edge = new Edge(from, to);
         edges.Add(edge);
         return edge;
+    }
+
+    internal void AddEdge(Edge edge)
+    {
+        edges.Add(edge);
+
     }
 }

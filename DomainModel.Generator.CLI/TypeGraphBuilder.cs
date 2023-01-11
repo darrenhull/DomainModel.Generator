@@ -26,15 +26,15 @@ public class TypeGraphBuilder
             if (newNode == node)
                 continue;
 
-            if (conn.Any(c => c.AreConnected(node, newNode)))
+            foreach(var connection in conn)
             {
-                graph.AddEdge(node, newNode);
+                if(connection.AreConnected(node, newNode))
+                    graph.AddEdge(connection.GetEdge(node, newNode));
+
+                if (connection.AreConnected(newNode,node))
+                    graph.AddEdge(connection.GetEdge(newNode, node));
             }
 
-            if (conn.Any(c => c.AreConnected(newNode, node)))
-            {
-                graph.AddEdge(newNode, node);
-            }
         }
     }
 }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DomainModel.Generator.CLI": {
+      "commandName": "Project",
+      "commandLineArgs": "model generate -m .\\Src\\Atlas.Opportunity.Functions.Azure\\bin\\Debug\\net6.0\\Atlas.Opportunity.Domain.Models.dll -o \".\\Doc\\Architecture\\Class Diagrams\\OpportunityDomain.Models.mmd\""
+    }
+  }
+}

@@ -53,22 +53,34 @@ Options:
         showHelp = showHelp ?? (_ => 0);
         showVersion = showVersion ?? (_ => 0);
 
-        return Docopt.CreateParser(Usage)
-                     .WithVersion("Domain model v" + GetVersion())
-                     .Parse(args)
-                     .Match<int>(result =>
-                     {
-                         if (!result["generate"].IsTrue)
-                             return 1;
-                         var options = CreateOptionsFrom(result);
-                         //new OptionsValidator().AssertOptions(options);
+        //return onSuccess(new Options(
+        //    generateOptions: new GenerateOptions(
+        //        outputPath: @"C:\Git\Atlas\atlas-opportunity-services\Doc\Architecture\Class Diagrams\OpportunityDomain.Models.mmd",
+        //        diagramType: "class",
+        //        outputFormat: "mermaid"),
 
-                         return onSuccess(options);
+        //    //outputFormat: (string)arguments["--format"]),
+        //    modulePath: "C:\\Git\\Atlas\\atlas-opportunity-services\\Src\\Atlas.Opportunity.Functions.Azure\\bin\\Debug\\net6.0\\Atlas.Opportunity.Domain.Models.dll"
+        //    //includeNamespaces: ((StringList)arguments["--namespace"]).ToArray(),
+        //    //includeTypes: ((StringList)arguments["--type"]).ToArray(),
+        //    //excludeNamespaces: ((StringList)arguments["--ignore-namespace"]).ToArray(),
+        //    //excludeTypes: ((StringList)arguments["--ignore-type"]).ToArray());
+        //    ));
 
-                     },
-                            (Func<IHelpResult, int>)(result => showHelp(result.Help)),
-                            (Func<IVersionResult, int>)(result => showVersion(result.Version)),
-                            (Func<IInputErrorResult, int>)(result => onError(result.Usage)));
+        return onSuccess(new Options(
+          generateOptions: new GenerateOptions(
+              outputPath: @"C:\Git\Atlas\atlas-opportunity-services\Doc\Architecture\Class Diagrams\OpportunityDomain.Models.mmd",
+              diagramType: "class",
+              outputFormat: "mermaid"),
+
+          //outputFormat: (string)arguments["--format"]),
+          modulePath: "C:\\Git\\Atlas\\atlas-opportunity-services\\Src\\Atlas.Opportunity.Functions.Azure\\bin\\Debug\\net6.0\\Atlas.Opportunity.Domain.Models.dll",
+          includeNamespaces: new[] { "Common.Models", "Atlas.Opportunity.Domain.Models", "TaskManagement.Core.Models.Domain" }
+          //includeNamespaces: ((StringList)arguments["--namespace"]).ToArray(),
+          //includeTypes: ((StringList)arguments["--type"]).ToArray(),
+          //excludeNamespaces: ((StringList)arguments["--ignore-namespace"]).ToArray(),
+          //excludeTypes: ((StringList)arguments["--ignore-type"]).ToArray());
+          ));
     }
 
 }

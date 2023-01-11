@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace DomainModel.Generator.CLI;
 
 public class ModelReflector
@@ -12,7 +14,8 @@ public class ModelReflector
     {
         var graphBuilder = new TypeGraphBuilder(new INodeConnectionStrategy[] {
             new ByIdNodeConnectionStrategy(),
-            new ByTypeNodeConnectionStrategy()
+            new ByTypeNodeConnectionStrategy(),
+            new ByInheritanceConnectionStrategy()
             });
         foreach (var type in types)
         {
@@ -22,17 +25,39 @@ public class ModelReflector
             var node = new Node(type);
             try
             {
-                foreach (var property in type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+                if (type.IsEnum)
                 {
-                    try
+                    var enumName = type.Name;
+                    foreach (var fieldInfo in type.GetFields())
                     {
-                        node.AddPublicAttribute(property.Name, property.PropertyType);
+                        var name = fieldInfo.Name;
+
+                        if (fieldInfo.FieldType.IsEnum)
+                        {
+                            node.AddPublicAttribute(name, typeof(void));
+                        }
                     }
-                    catch (FileNotFoundException ex)
+                }else
+                {
+                    var baseProperties = new List<PropertyInfo>();
+
+                    if (type.BaseType != null && type.BaseType != typeof(object))
+                        baseProperties.AddRange(type.BaseType.GetProperties(BindingFlags.Public |BindingFlags.Instance));
+
+
+                    foreach (var property in type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
                     {
-                        Console.Error.WriteLine($"Error when reflecting {type.Name}.{property.Name}.");
-                        PrintException(ex);
-                        node.AddPublicAttribute(property.Name, typeof(object));
+                        try
+                        {
+                            if(baseProperties.All(x=>!x.Name.Equals(property.Name)))
+                                node.AddPublicAttribute(property.Name, property.PropertyType);
+                        }
+                        catch (FileNotFoundException ex)
+                        {
+                            Console.Error.WriteLine($"Error when reflecting {type.Name}.{property.Name}.");
+                            PrintException(ex);
+                            node.AddPublicAttribute(property.Name, typeof(object));
+                        }
                     }
                 }
                 graphBuilder.AddNode(node);
